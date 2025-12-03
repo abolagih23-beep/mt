@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Multi-Language Translator</title>
+<title>Universal Multi-Language Translator</title>
 <style>
 body{font-family:Arial;text-align:center;padding:30px;background:linear-gradient(135deg,#f0f8ff,#cce7ff);}
 h1{margin-bottom:20px;color:#0a3d62;}
@@ -33,27 +33,33 @@ document.getElementById("translateBtn").addEventListener("click", async () => {
     const text = document.getElementById("inputText").value.trim();
     const targetLang = document.getElementById("language").value;
     const resDiv = document.getElementById("result");
+
     if (!text) {
         resDiv.textContent = "Please enter text!";
         gsap.fromTo(resDiv,{opacity:0,y:-10},{opacity:1,y:0,duration:.4});
         return;
     }
+
     try {
-        const response = await fetch("/translate",{
-            method:"POST",
-            headers:{"Content-Type":"application/json"},
-            body:JSON.stringify({text:text,target:targetLang})
+        const response = await fetch("/translate", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({text: text, target: targetLang})
         });
         const data = await response.json();
-        if(data.translatedText){
+
+        if (data.translatedText) {
             resDiv.textContent = data.translatedText;
+        } else if (data.error) {
+            resDiv.textContent = "Translation failed: " + data.error;
         } else {
-            resDiv.textContent = "Translation failed!";
+            resDiv.textContent = "Translation failed: Unknown error";
         }
+
         gsap.fromTo(resDiv,{opacity:0,y:-20},{opacity:1,y:0,duration:.5});
     } catch(err){
         console.error(err);
-        resDiv.textContent="Translation failed! Is the server running?";
+        resDiv.textContent="Translation failed! Check server logs or internet connection.";
     }
 });
 </script>

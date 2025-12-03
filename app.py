@@ -28,12 +28,21 @@ def translate():
                 "target": target_lang,
                 "format": "text"
             },
-            timeout=10
+            headers={"accept": "application/json"},
+            timeout=15
         )
-        translated = response.json().get("translatedText", "")
+        response.raise_for_status()  # Catch HTTP errors
+        translated = response.json().get("translatedText")
+        if not translated:
+            return jsonify({"error": "No translation returned from API"}), 500
         return jsonify({"translatedText": translated})
+
+    except requests.exceptions.Timeout:
+        return jsonify({"error": "Translation API timed out"}), 504
+    except requests.exceptions.RequestException as e:
+        return jsonify({"error": f"Translation API error: {str(e)}"}), 500
     except Exception as e:
-        return jsonify({"error": str(e)}), 500
+        return jsonify({"error": f"Unknown error: {str(e)}"}), 500
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
