@@ -20,8 +20,9 @@ def translate():
         return jsonify({"error": "Missing text or target language"}), 400
 
     try:
+        # Reliable LibreTranslate endpoint
         response = requests.post(
-            "https://libretranslate.de/translate",
+            "https://translate.argosopentech.com/translate",
             json={
                 "q": text,
                 "source": "auto",
@@ -31,7 +32,7 @@ def translate():
             headers={"accept": "application/json"},
             timeout=15
         )
-        response.raise_for_status()  # Catch HTTP errors
+        response.raise_for_status()
         translated = response.json().get("translatedText")
         if not translated:
             return jsonify({"error": "No translation returned from API"}), 500
